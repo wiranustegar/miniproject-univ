@@ -7,8 +7,6 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class CreateClassroomDto {
-//    @NotNull(message = "Classroom id is required to be created")
-//    private String classroomId;
 
     @NotNull(message = "lecturerId is required")
     private String lecturerId;
@@ -16,15 +14,11 @@ public class CreateClassroomDto {
     @NotNull(message = "subjectId is required")
     private String subjectId;
 
-    @NotNull(message = "classroom code is required")
-    private String classroomCode;
-
     @NotNull(message = "period is required")
     private String period;
 
     public Classroom toInitiateClassroom(){
         return new Classroom()
-                .setClassroomCode(classroomCode)
                 .setPeriod(period);
     }
 

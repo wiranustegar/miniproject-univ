@@ -17,7 +17,7 @@ import java.util.Optional;
 public class StudentController {
 
     @Autowired
-    StudentService studentService;
+    private StudentService studentService;
 
     @PostMapping("")
     public ResponseEntity<Student> createStudent(@RequestBody Student student){

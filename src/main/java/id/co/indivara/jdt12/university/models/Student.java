@@ -1,16 +1,12 @@
 package id.co.indivara.jdt12.university.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Generated;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenerationTime;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +36,7 @@ public class Student extends BaseEntity {
     @Column(name = "gender", nullable = false)
     private String gender;
 
-    @ManyToMany
+    @OneToMany
     @JoinTable(
             name = "trx_reports",
             joinColumns = @JoinColumn(name = "student_id"),
@@ -48,14 +44,15 @@ public class Student extends BaseEntity {
     )
     private List<Report> enrolledSubjects;
 
-    public Student(String studentId, String studentName, String email, String gender) {
+    public Student(String studentId, String studentName, Integer studentRegNumber, String email, String gender) {
         this.studentId = studentId;
         this.studentName = studentName;
+        this.studentRegNumber = studentRegNumber;
         this.email = email;
         this.gender = gender;
     }
-//    @PrePersist
-//    private void onCreate(){
-//        this.studentRegNumber = ran;
-//    }
+
+    public Student(String studentId) {
+        this.studentId = studentId;
+    }
 }

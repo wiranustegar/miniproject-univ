@@ -32,8 +32,4 @@ public class Subject extends BaseEntity {
         this.subjectName = subjectName;
     }
 
-    //    public String  subjectCode(){
-//        return "sub" + subjectId;
-//    }
-
 }

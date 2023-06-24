@@ -25,11 +25,6 @@ public class ReportController {
     @Autowired
     private ReportService reportService;
 
-    @Autowired
-    private StudentService studentService;
-
-    @Autowired
-    private ClassroomService classroomService;
 
     @PostMapping("")
     public ResponseEntity<Report> registerStudent(@Valid @RequestBody RegisterStudentDto registerStudentDto) throws ResourceNotFoundException {
