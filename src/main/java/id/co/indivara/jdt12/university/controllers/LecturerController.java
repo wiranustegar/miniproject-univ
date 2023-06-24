@@ -17,10 +17,10 @@ import java.util.Optional;
 public class LecturerController {
 
     @Autowired
-    LecturerService lecturerService;
+    private LecturerService lecturerService;
 
     @PostMapping("")
-    public ResponseEntity<Lecturer> createLecturer(@Valid @RequestBody Lecturer lecturer){
+    public ResponseEntity<Lecturer> createLecturer(@RequestBody Lecturer lecturer){
         return new ResponseEntity<>(lecturerService.createLecturer(lecturer), HttpStatus.CREATED);
     }
 

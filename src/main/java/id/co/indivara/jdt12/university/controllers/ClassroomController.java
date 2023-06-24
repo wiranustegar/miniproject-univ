@@ -23,13 +23,6 @@ public class ClassroomController {
     @Autowired
     private ClassroomService classroomService;
 
-    @Autowired
-    private LecturerService lecturerService;
-
-    @Autowired
-    private SubjectService subjectService;
-
-
     @PostMapping("")
     public ResponseEntity<Classroom> createClassroom(@Valid @RequestBody CreateClassroomDto createClassroomDto) throws ResourceNotFoundException {
         return new ResponseEntity<>(classroomService.initiateClassroom(createClassroomDto), HttpStatus.CREATED);

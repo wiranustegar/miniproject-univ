@@ -15,7 +15,7 @@ import java.util.List;
 public class SubjectController {
 
     @Autowired
-    SubjectService subjectService;
+    private SubjectService subjectService;
 
     @PostMapping("")
     public ResponseEntity<Subject> createSubject(@RequestBody Subject subject){
