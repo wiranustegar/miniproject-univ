@@ -22,7 +22,7 @@ public class Classroom extends BaseEntity {
     @Column(name = "classroom_id")
     private String classroomId;
 
-    @ManyToOne(targetEntity = Lecturer.class, cascade = CascadeType.REMOVE)
+    @ManyToOne(targetEntity = Lecturer.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "lecturer_id", nullable = false)
     @JsonIgnore
     private Lecturer lecturerId;
@@ -30,16 +30,14 @@ public class Classroom extends BaseEntity {
     @Column(name = "classroom_code", nullable = false, unique = true)
     private String classroomCode;
 
-    @ManyToOne(targetEntity = Subject.class, cascade = CascadeType.REMOVE)
+    @ManyToOne(targetEntity = Subject.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "subject_id")
     private Subject subjectId;
 
     @Column(name = "period")
     private String period;
 
-    @ManyToMany(mappedBy = "assignedLecturer")
-    @JsonIgnore
-    private List<Lecturer> lecturers;
+
 
     public Classroom(String classroomId) {
         this.classroomId = classroomId;

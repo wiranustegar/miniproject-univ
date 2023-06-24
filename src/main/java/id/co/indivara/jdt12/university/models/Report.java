@@ -22,11 +22,12 @@ public class Report extends BaseEntity {
     @Column(name = "report_id")
     private String reportId;
 
-    @ManyToMany(mappedBy = "enrolledSubjects")
+    @ManyToOne(targetEntity = Student.class, cascade = CascadeType.ALL)
+    @JoinColumn(name = "student_id", nullable = false)
     @JsonIgnore
-    private List<Student> students;
+    private Student studentId;
 
-    @ManyToOne(targetEntity = Classroom.class, cascade = CascadeType.REMOVE)
+    @ManyToOne(targetEntity = Classroom.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "classroom_id", nullable = false)
     private Classroom classroomId;
 
@@ -42,13 +43,8 @@ public class Report extends BaseEntity {
     @Column(name = "grade")
     private Character grade;
 
-    @OneToOne(targetEntity = Student.class, cascade = CascadeType.REMOVE)
-    @JoinColumn(name = "student_id", nullable = false)
-    @JsonIgnore
-    private Student studentId;
-
-    public Report(String id, Classroom classroomId, Student studentId) {
-        this.reportId = id;
+    public Report(String reportId, Classroom classroomId, Student studentId) {
+        this.reportId = reportId;
         this.classroomId = classroomId;
         this.studentId = studentId;
     }

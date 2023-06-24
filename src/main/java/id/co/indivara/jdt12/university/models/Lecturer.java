@@ -1,5 +1,6 @@
 package id.co.indivara.jdt12.university.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
@@ -38,7 +39,7 @@ public class Lecturer extends BaseEntity{
     @Column(name = "gender", nullable = false)
     private String gender;
 
-    @ManyToMany
+    @OneToMany
     @JoinTable(
             name = "trx_classrooms",
             joinColumns = @JoinColumn(name = "lecturer_id"),
@@ -46,9 +47,10 @@ public class Lecturer extends BaseEntity{
     )
     private List<Classroom> assignedLecturer;
 
-    public Lecturer(String lecturerId, String lecturerName, String specialization, String email, String gender) {
+    public Lecturer(String lecturerId, String lecturerName, Integer lecturerRegNumber, String specialization, String email, String gender) {
         this.lecturerId = lecturerId;
         this.lecturerName = lecturerName;
+        this.lecturerRegNumber = lecturerRegNumber;
         this.specialization = specialization;
         this.email = email;
         this.gender = gender;
