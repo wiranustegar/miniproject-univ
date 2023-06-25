@@ -40,7 +40,6 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     public Report save(Report report) {
-
         return reportRepository.save(report);
     }
 
@@ -58,22 +57,12 @@ public class ReportServiceImpl implements ReportService {
 
             return registeredStudent;
 
+    }
 
-//        Student existingStudent = reportRepository.findById(registerStudentDto.getStudentId()).ge;
-//        Classroom existingClassroom = classroomRepository.findById(registerStudentDto.getClassroomId()).get();
-//
-//        if (studentRequest.equals(existingStudent) && classroomRequest.equals(existingClassroom)){
-//            throw new DuplicateKeyException("df");
-//        } else {
-//            Report reportInput = registerStudentDto.toRegisterStudent()
-//                    .setStudentId(studentRequest)
-//                    .setClassroomId(classroomRequest);
-//
-//            Report registeredStudent = save(reportInput);
-//
-//            return registeredStudent;
-//        }
-
+    @Override
+    public ArrayList<Report> findByStudentId(Student studentId) {
+        ArrayList <Report> reports = (ArrayList<Report>) reportRepository.findByStudentId(studentId);
+        return reports;
     }
 
     @Override

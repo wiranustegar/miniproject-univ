@@ -9,14 +9,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class StudentServiceImpl implements StudentService {
     @Autowired
-    StudentRepository studentRepository;
+    private StudentRepository studentRepository;
 
     @Override
     public Student createStudent(Student student) {
+        Random random = new Random();
+        student.setStudentRegNumber(random.nextInt(10000));
         return studentRepository.save(student);
     }
 

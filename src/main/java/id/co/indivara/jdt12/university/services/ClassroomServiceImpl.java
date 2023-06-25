@@ -15,10 +15,10 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class ClassroomServiceImpl implements ClassroomService {
-
 
     @Autowired
     private ClassroomRepository classroomRepository;
@@ -42,7 +42,11 @@ public class ClassroomServiceImpl implements ClassroomService {
 
         Classroom classroomInput = createClassroomDto.toInitiateClassroom()
                 .setLecturerId(lect)
-                .setSubjectId(subj);
+                .setSubjectId(subj)
+                .setPeriod(createClassroomDto.getPeriod());
+
+        Random random = new Random();
+        classroomInput.setClassroomCode("CRM"+random.nextInt(1000));
 
         Classroom createdClassroom = create(classroomInput);
 

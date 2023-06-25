@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class SubjectServiceImpl implements SubjectService {
@@ -23,6 +24,8 @@ public class SubjectServiceImpl implements SubjectService {
 
     @Override
     public Subject createSubject(Subject subject) {
+        Random random = new Random();
+        subject.setSubjectCode("SUB" + (random.nextInt(100)));
         return subjectRepository.save(subject);
     }
 
