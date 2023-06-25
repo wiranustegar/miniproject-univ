@@ -3,6 +3,7 @@ package id.co.indivara.jdt12.university.controllers;
 import id.co.indivara.jdt12.university.exceptions.ResourceNotFoundException;
 import id.co.indivara.jdt12.university.models.Classroom;
 import id.co.indivara.jdt12.university.models.Report;
+import id.co.indivara.jdt12.university.models.Student;
 import id.co.indivara.jdt12.university.models.dtos.InputRecordAchievementDto;
 import id.co.indivara.jdt12.university.models.dtos.RegisterStudentDto;
 import id.co.indivara.jdt12.university.services.interfaces.ClassroomService;
@@ -26,7 +27,7 @@ public class ReportController {
     private ReportService reportService;
 
 
-    @PostMapping("")
+    @PostMapping("/register")
     public ResponseEntity<Report> registerStudent(@Valid @RequestBody RegisterStudentDto registerStudentDto) throws ResourceNotFoundException {
         return new ResponseEntity<>(reportService.registerStudent(registerStudentDto), HttpStatus.CREATED);
 
@@ -47,5 +48,9 @@ public class ReportController {
         return new ResponseEntity<>(reportService.findByClassroomId(classroomId), HttpStatus.OK);
     }
 
+    @GetMapping("/student/{studentId}")
+    public ResponseEntity<List<Report>> findReportByStudentId(@Valid @PathVariable("studentId") Student studentId){
+        return new ResponseEntity<>(reportService.findByStudentId(studentId),HttpStatus.OK);
+    }
 
 }

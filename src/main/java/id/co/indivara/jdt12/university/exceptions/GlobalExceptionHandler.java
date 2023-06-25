@@ -46,24 +46,4 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<?> constraintViolationException(ConstraintViolationException ex, WebRequest request) {
-        List<String> errors = new ArrayList<>();
-
-        ex.getConstraintViolations().forEach(cv -> errors.add(cv.getMessage()));
-
-        Map<String, List<String>> result = new HashMap<>();
-        result.put("errors", errors);
-
-        return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(DuplicateKeyException.class)
-    public ResponseEntity<?> duplicateKeyExcepttion(DuplicateKeyException ex, WebRequest request){
-        Map<String, String> body = new HashMap<>();
-
-        body.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
-    }
 }
