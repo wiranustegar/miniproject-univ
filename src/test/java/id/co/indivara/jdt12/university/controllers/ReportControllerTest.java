@@ -1,42 +1,73 @@
-//package id.co.indivara.jdt12.university.controllers;
-//
-//import com.fasterxml.jackson.core.JsonProcessingException;
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import id.co.indivara.jdt12.university.models.Classroom;
-//import id.co.indivara.jdt12.university.models.Report;
-//import id.co.indivara.jdt12.university.models.Student;
-//import id.co.indivara.jdt12.university.services.interfaces.ReportService;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.http.MediaType;
-//import org.springframework.test.web.servlet.MockMvc;
-//
-//import static org.junit.jupiter.api.Assertions.*;
-//import static org.mockito.Mockito.when;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-//
-//@WebMvcTest(ReportController.class)
-//class ReportControllerTest {
-//
-//    @Autowired
-//    private MockMvc mockMvc;
-//
-//    @Autowired
-//    private ReportService reportService;
-//
-//    @Test
-//    void testRegisterStudentSuccess() throws Exception {
-//
-//        Report reportRequest = new Report(12L, new Classroom(), new Student());
-//        when(reportService.register(reportRequest)).thenReturn(reportRequest);
-//        mockMvc.perform(post("/report")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(new ObjectMapper().writeValueAsString(reportRequest)))
-//                .andExpect(status().isCreated());
-//    }
-//
-//}
+package id.co.indivara.jdt12.university.controllers;
+
+import id.co.indivara.jdt12.university.services.interfaces.ReportService;
+import id.co.indivara.jdt12.university.services.interfaces.StudentService;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+class ReportControllerTest {
+
+    @MockBean
+    ReportService reportService;
+
+    @Autowired
+    MockMvc mockMvc;
+
+
+    //----- POSITIVE CASE -------
+    @Test
+    void testRegisterStudentSuccess() throws Exception {
+
+        String registerStudentJson = "{\"studentId\":\"4028b88188ee20690188ee2131bf0000\",\"classroomId\":\"4028b88188ee20690188ee23d7e00002\"}";
+        ResultActions resultActions = mockMvc.perform(post("/report")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registerStudentJson))
+                .andExpect(status().isCreated());
+
+    }
+
+    @Test
+    void testInputRecordAchievement() throws Exception {
+
+        String inputRecord = "{\"reportId\":\"4028b88188ee20690188ee24d1d30003\",\"quizTest\":70,\"midTest\":80,\"finalTest\":90}";
+        ResultActions resultActions = mockMvc.perform(put("/report/input-record")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(inputRecord))
+                .andExpect(status().isOk());
+    }
+
+    //------- NEGATIVE CASE --------
+
+    @Test
+    void registerStudentBadRequestTest() throws Exception {
+
+        String registerStudentJson = "{\"classroomId\":\"4028b88188ee20690188ee23d7e00002\"}";
+        ResultActions resultActions = mockMvc.perform(post("/report")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(registerStudentJson))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void inputRecordAchievementBadRequestTest() throws Exception {
+
+        String inputRecord = "{\"reportId\":\"4028b88188ee20690188ee24d1d30003\"midTest\":80,\"finalTest\":90}";
+        ResultActions resultActions = mockMvc.perform(put("/report/input-record")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(inputRecord))
+                .andExpect(status().isBadRequest());
+    }
+
+}
