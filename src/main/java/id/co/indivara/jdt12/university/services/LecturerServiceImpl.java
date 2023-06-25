@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class LecturerServiceImpl implements LecturerService {
@@ -23,6 +24,8 @@ public class LecturerServiceImpl implements LecturerService {
 
     @Override
     public Lecturer createLecturer(Lecturer lecturer) {
+        Random random = new Random();
+        lecturer.setLecturerRegNumber(random.nextInt(10000));
         return lecturerRepository.save(lecturer);
     }
 

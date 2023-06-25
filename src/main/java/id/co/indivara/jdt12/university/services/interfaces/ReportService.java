@@ -28,6 +28,7 @@ public interface ReportService {
     //GET "/report/{classroomId}"
     ArrayList<Report> findByClassroomId(Classroom classroomId);
 
+    ArrayList<Report> findByStudentId(Student studentId);
 
 
 }
