@@ -46,4 +46,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> runtimeException(RuntimeException ex, WebRequest request){
+        Map<String, String> body = new HashMap<>();
+
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
 }
