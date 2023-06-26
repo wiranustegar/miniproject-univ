@@ -19,27 +19,27 @@ public class StudentController {
     @Autowired
     private StudentService studentService;
 
-    @PostMapping("")
+    @PostMapping("/")
     public ResponseEntity<Student> createStudent(@RequestBody Student student){
         return new ResponseEntity<>(studentService.createStudent(student), HttpStatus.CREATED);
     }
 
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<List<Student>> getAllStudents(){
         return new ResponseEntity<>(studentService.fetchStudentList(), HttpStatus.OK) ;
     }
 
-    @GetMapping("{studentId}")
+    @GetMapping("/{studentId}/")
     public ResponseEntity<Optional<Student>> getStudentById(@PathVariable("studentId") String studentId) throws ResourceNotFoundException {
         return new ResponseEntity<>(studentService.findById(studentId), HttpStatus.OK);
     }
 
-    @PutMapping("{studentId}")
+    @PutMapping("/{studentId}/")
     public ResponseEntity<Student> updateStudent(@RequestBody Student student, @PathVariable("studentId") String studentId) throws ResourceNotFoundException {
         return new ResponseEntity<>(studentService.updateStudent(student, studentId), HttpStatus.OK);
     }
 
-    @DeleteMapping("{studentId}")
+    @DeleteMapping("/{studentId}/")
     public ResponseEntity<Student> deleteStudent(@PathVariable("studentId") String studentId) throws ResourceNotFoundException {
         studentService.deleteStudent(studentId);
         return new ResponseEntity<>(HttpStatus.OK);

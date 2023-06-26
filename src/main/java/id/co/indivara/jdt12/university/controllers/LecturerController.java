@@ -19,27 +19,27 @@ public class LecturerController {
     @Autowired
     private LecturerService lecturerService;
 
-    @PostMapping("")
+    @PostMapping("/")
     public ResponseEntity<Lecturer> createLecturer(@RequestBody Lecturer lecturer){
         return new ResponseEntity<>(lecturerService.createLecturer(lecturer), HttpStatus.CREATED);
     }
 
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<List<Lecturer>> getAllLecturers(){
         return new ResponseEntity<>(lecturerService.fetchLecturerList(), HttpStatus.OK) ;
     }
 
-    @GetMapping("{lecturerId}")
+    @GetMapping("/{lecturerId}/")
     public ResponseEntity<Optional<Lecturer>> getLecturerById(@Valid @PathVariable("lecturerId") String lecturerId) throws ResourceNotFoundException {
         return new ResponseEntity<>(lecturerService.findById(lecturerId),HttpStatus.OK);
     }
 
-    @PutMapping("{lecturerId}")
+    @PutMapping("/{lecturerId}/")
     public ResponseEntity<Lecturer> updateLecturer(@Valid @RequestBody Lecturer lecturer, @PathVariable("lecturerId") String lecturerId) throws ResourceNotFoundException {
         return new ResponseEntity<>(lecturerService.updateLecturer(lecturer, lecturerId), HttpStatus.OK);
     }
 
-    @DeleteMapping("{lecturerId}")
+    @DeleteMapping("/{lecturerId}/")
     public ResponseEntity<Lecturer> deleteLecturer(@PathVariable("lecturerId") String lecturerId) throws ResourceNotFoundException {
         lecturerService.deleteLecturer(lecturerId);
         return new ResponseEntity<>(HttpStatus.OK);

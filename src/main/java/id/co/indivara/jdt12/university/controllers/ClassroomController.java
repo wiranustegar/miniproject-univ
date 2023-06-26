@@ -23,18 +23,18 @@ public class ClassroomController {
     @Autowired
     private ClassroomService classroomService;
 
-    @PostMapping("")
+    @PostMapping("/")
     public ResponseEntity<Classroom> createClassroom(@Valid @RequestBody CreateClassroomDto createClassroomDto) throws ResourceNotFoundException {
         return new ResponseEntity<>(classroomService.initiateClassroom(createClassroomDto), HttpStatus.CREATED);
     }
 
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity <List<Classroom>> allClassrooms(){
         return new ResponseEntity<>(classroomService.findAll(),HttpStatus.OK);
     }
 
 
-    @GetMapping("/{classroomId}")
+    @GetMapping("/{classroomId}/")
     public ResponseEntity<Optional<Classroom>> getClassroomById(@Valid @PathVariable("classroomId") String classroomId) throws ResourceNotFoundException {
         return new ResponseEntity<>(classroomService.findById(classroomId), HttpStatus.OK);
     }
