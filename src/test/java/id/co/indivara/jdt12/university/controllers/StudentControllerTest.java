@@ -55,7 +55,7 @@ class StudentControllerTest {
         mockMvc.perform(get("/student")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].studentName").value("Saidi"));
+                .andExpect(jsonPath("$[0].studentName").value("tegar"));
     }
 
     @Test

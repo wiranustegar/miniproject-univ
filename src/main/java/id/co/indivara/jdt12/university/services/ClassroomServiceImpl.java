@@ -37,20 +37,28 @@ public class ClassroomServiceImpl implements ClassroomService {
     @Override
     public Classroom initiateClassroom(CreateClassroomDto createClassroomDto) throws ResourceNotFoundException {
 
-        Lecturer lect = lecturerService.findById(createClassroomDto.getLecturerId()).orElseThrow(() -> new ResourceNotFoundException("LecturerId not found"));
-        Subject subj = subjectService.findById(createClassroomDto.getSubjectId()).orElseThrow(() -> new ResourceNotFoundException("LecturerId not found"));
+        Lecturer lecturerRequest = lecturerService.findById(createClassroomDto.getLecturerId()).orElseThrow(() -> new ResourceNotFoundException("LecturerId not found"));
+        Subject subjectRequest = subjectService.findById(createClassroomDto.getSubjectId()).orElseThrow(() -> new ResourceNotFoundException("LecturerId not found"));
 
-        Classroom classroomInput = createClassroomDto.toInitiateClassroom()
-                .setLecturerId(lect)
-                .setSubjectId(subj)
-                .setPeriod(createClassroomDto.getPeriod());
+        //CHECK EXISTENCE REGISTERED LECTURER TO SUBJECT IN CLASSROOMS TABLE
+        List<Classroom> lecturerExist = classroomRepository.findByLecturerId(lecturerRequest);
+        List<Classroom> subjectExist = classroomRepository.findBySubjectId(subjectRequest);
 
-        Random random = new Random();
-        classroomInput.setClassroomCode("CRM"+random.nextInt(1000));
+        if (!lecturerExist.isEmpty() && !subjectExist.isEmpty()){
+            throw new RuntimeException("Lecturer is already registered as lecturer in that subject");
+        } else {
+            Classroom classroomInput = createClassroomDto.toInitiateClassroom()
+                    .setLecturerId(lecturerRequest)
+                    .setSubjectId(subjectRequest)
+                    .setPeriod(createClassroomDto.getPeriod());
 
-        Classroom createdClassroom = create(classroomInput);
+            Random random = new Random();
+            classroomInput.setClassroomCode("CRM"+random.nextInt(1000));
 
-        return createdClassroom;
+            Classroom createdClassroom = create(classroomInput);
+
+            return createdClassroom;
+        }
 
     }
 
@@ -66,5 +74,17 @@ public class ClassroomServiceImpl implements ClassroomService {
     @Override
     public Optional<Classroom> findById(String classroomId) throws ResourceNotFoundException {
         return Optional.ofNullable(classroomRepository.findById(classroomId).orElseThrow(() -> new ResourceNotFoundException("classroom id " + classroomId + " not found")));
+    }
+
+    @Override
+    public List<Classroom> findClassroomByLecturerId(Lecturer lecturerId) {
+        List<Classroom> classroomList = classroomRepository.findByLecturerId(lecturerId);
+        return classroomList;
+    }
+
+    @Override
+    public List<Classroom> findClassroomBySubjectId(Subject subjectId) {
+        List<Classroom> classroomList = classroomRepository.findBySubjectId(subjectId);
+        return classroomList;
     }
 }

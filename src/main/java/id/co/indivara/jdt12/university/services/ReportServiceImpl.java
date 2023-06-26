@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -49,13 +50,21 @@ public class ReportServiceImpl implements ReportService {
         Student studentRequest = studentService.findById(registerStudentDto.getStudentId()).orElseThrow(() -> new ResourceNotFoundException("StudentId not found"));
         Classroom classroomRequest = classroomService.findById(registerStudentDto.getClassroomId()).orElseThrow(() -> new ResourceNotFoundException("StudentId not found"));
 
-        Report reportInput = registerStudentDto.toRegisterStudent()
+        //CHECK EXISTENCE REGISTERED STUDENT TO CLASSROOM IN REPORT TABLE
+        List<Report> studentExist = reportRepository.findByStudentId(studentRequest);
+        List<Report> classExist = reportRepository.findByClassroomId(classroomRequest);
+
+        if (!studentExist.isEmpty() && !classExist.isEmpty()){
+            throw new RuntimeException("Student already registered in that class");
+        } else {
+            Report reportInput = registerStudentDto.toRegisterStudent()
                     .setStudentId(studentRequest)
                     .setClassroomId(classroomRequest);
 
             Report registeredStudent = save(reportInput);
 
             return registeredStudent;
+        }
 
     }
 
@@ -80,7 +89,7 @@ public class ReportServiceImpl implements ReportService {
         int count = (inputRecordAchievementDto.getQuizTest() + inputRecordAchievementDto.getMidTest() + inputRecordAchievementDto.getFinalTest()) / 3;
         char grade;
 
-        if (count > 80){
+        if (count >= 80){
             grade = 'A';
         } else if (count >= 75) {
             grade = 'B';
@@ -92,17 +101,12 @@ public class ReportServiceImpl implements ReportService {
             grade = 'E';
         }
 
-        //GET ALL RECORD FROM DTO
-        Report inputRecordDto = inputRecordAchievementDto.toInputRecordAchievement()
-                .setQuizTest(inputRecordAchievementDto.getQuizTest())
+        //SAVE DTO TO REPORT
+        updateReport.setQuizTest(inputRecordAchievementDto.getQuizTest())
                 .setMidTest(inputRecordAchievementDto.getMidTest())
-                .setFinalTest(inputRecordAchievementDto.getFinalTest());
-
-        //SAVE ALL FROM DTO TO REPORT
-        updateReport.setQuizTest(inputRecordDto.getQuizTest())
-                .setMidTest(inputRecordDto.getMidTest())
-                .setFinalTest(inputRecordDto.getFinalTest())
+                .setFinalTest(inputRecordAchievementDto.getFinalTest())
                 .setGrade(grade);
+
 
         Report inputRecord = save(updateReport);
 

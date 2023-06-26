@@ -14,6 +14,4 @@ public interface ReportRepository extends JpaRepository<Report, String> {
 
     List<Report> findByStudentId(Student studentId);
 
-
-
 }
