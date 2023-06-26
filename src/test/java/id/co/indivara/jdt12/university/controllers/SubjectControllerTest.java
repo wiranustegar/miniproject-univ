@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -26,19 +27,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(SubjectController.class)
 class SubjectControllerTest {
     @MockBean
-    SubjectService subjectService;
+    private SubjectService subjectService;
 
     @Autowired
     MockMvc mockMvc;
 
+    private String adminAuth = "Basic YWRtaW46aW5pYWRtaW4=";
 
     @Test
     void createSubjectTest() throws Exception {
         Subject subject = new Subject("90989", "MH1", "Math");
         when(subjectService.createSubject(subject)).thenReturn(subject);
-        mockMvc.perform(post("/subject")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(subject)))
+        mockMvc.perform(post("/subject/")
+                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(subject)))
                 .andExpect(status().isCreated());
     }
 
@@ -47,7 +50,8 @@ class SubjectControllerTest {
         List<Subject> subjects = Arrays.asList(new Subject("90989", "MH1", "Math"),
                 new Subject("9808", "SC1", "Science")) ;
         when(subjectService.fetchSubjectList()).thenReturn(subjects);
-        mockMvc.perform(get("/subject")
+        mockMvc.perform(get("/subject/")
+                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].subjectName").value("Math"))
@@ -58,8 +62,9 @@ class SubjectControllerTest {
     void deleteSubject() throws Exception {
         Subject subject = new Subject("90989", "MH1", "Math");
         doNothing().when(subjectService).deleteSubject("90989");
-        mockMvc.perform(delete("/subject/{subjectId}", 90989)
+        mockMvc.perform(delete("/subject/{subjectId}/", 90989)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
                         .content(new ObjectMapper().writeValueAsString(subject)))
                 .andExpect(status().isOk());
     }
