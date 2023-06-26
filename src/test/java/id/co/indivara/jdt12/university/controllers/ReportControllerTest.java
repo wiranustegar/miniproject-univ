@@ -31,7 +31,7 @@ class ReportControllerTest {
     void testRegisterStudentSuccess() throws Exception {
 
         String registerStudentJson = "{\"studentId\":\"4028b88188ee20690188ee2131bf0000\",\"classroomId\":\"4028b88188ee20690188ee23d7e00002\"}";
-        ResultActions resultActions = mockMvc.perform(post("/report")
+        ResultActions resultActions = mockMvc.perform(post("/report/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(registerStudentJson))
                 .andExpect(status().isCreated());
@@ -54,7 +54,7 @@ class ReportControllerTest {
     void registerStudentBadRequestTest() throws Exception {
 
         String registerStudentJson = "{\"classroomId\":\"4028b88188ee20690188ee23d7e00002\"}";
-        ResultActions resultActions = mockMvc.perform(post("/report")
+        ResultActions resultActions = mockMvc.perform(post("/report/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(registerStudentJson))
                 .andExpect(status().isBadRequest());
