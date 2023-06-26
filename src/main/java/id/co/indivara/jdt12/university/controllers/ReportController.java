@@ -27,28 +27,28 @@ public class ReportController {
     private ReportService reportService;
 
 
-    @PostMapping("/register")
+    @PostMapping("/register/")
     public ResponseEntity<Report> registerStudent(@Valid @RequestBody RegisterStudentDto registerStudentDto) throws ResourceNotFoundException {
         return new ResponseEntity<>(reportService.registerStudent(registerStudentDto), HttpStatus.CREATED);
 
     }
 
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<List<Report>> allReports(){
         return new ResponseEntity<>(reportService.findAll(), HttpStatus.OK);
     }
 
-    @PutMapping("/input-record")
+    @PutMapping("/input-record/")
     public ResponseEntity<Report> inputRecordAchievement(@Valid @RequestBody InputRecordAchievementDto report) throws ResourceNotFoundException {
         return new ResponseEntity<>(reportService.inputRecordAchievement(report), HttpStatus.OK);
     }
 
-    @GetMapping("/{classroomId}")
+    @GetMapping("/{classroomId}/")
     public ResponseEntity<List<Report>> findReportByClassroomId(@Valid @PathVariable("classroomId") Classroom classroomId){
         return new ResponseEntity<>(reportService.findByClassroomId(classroomId), HttpStatus.OK);
     }
 
-    @GetMapping("/student/{studentId}")
+    @GetMapping("/student/{studentId}/")
     public ResponseEntity<List<Report>> findReportByStudentId(@Valid @PathVariable("studentId") Student studentId){
         return new ResponseEntity<>(reportService.findByStudentId(studentId),HttpStatus.OK);
     }

@@ -17,22 +17,22 @@ public class SubjectController {
     @Autowired
     private SubjectService subjectService;
 
-    @PostMapping("")
+    @PostMapping("/")
     public ResponseEntity<Subject> createSubject(@RequestBody Subject subject){
         return new ResponseEntity<>(subjectService.createSubject(subject), HttpStatus.CREATED);
     }
 
-    @GetMapping("")
+    @GetMapping("/")
     public ResponseEntity<List<Subject>> getAllSubjects(){
         return new ResponseEntity<>(subjectService.fetchSubjectList(), HttpStatus.OK) ;
     }
 
-    @PutMapping("{subjectId}")
+    @PutMapping("/{subjectId}/")
     public ResponseEntity<Subject> updateSubject(@RequestBody Subject subject, @PathVariable("subjectId") String subjectId) throws ResourceNotFoundException {
         return new ResponseEntity<>(subjectService.updateSubject(subject, subjectId), HttpStatus.OK);
     }
 
-    @DeleteMapping("{subjectId}")
+    @DeleteMapping("/{subjectId}/")
     public ResponseEntity<Subject> deleteSubject(@PathVariable("subjectId") String subjectId) throws ResourceNotFoundException {
         subjectService.deleteSubject(subjectId);
         return new ResponseEntity<>(HttpStatus.OK);

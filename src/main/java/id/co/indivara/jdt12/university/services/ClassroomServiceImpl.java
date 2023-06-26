@@ -38,7 +38,7 @@ public class ClassroomServiceImpl implements ClassroomService {
     public Classroom initiateClassroom(CreateClassroomDto createClassroomDto) throws ResourceNotFoundException {
 
         Lecturer lecturerRequest = lecturerService.findById(createClassroomDto.getLecturerId()).orElseThrow(() -> new ResourceNotFoundException("LecturerId not found"));
-        Subject subjectRequest = subjectService.findById(createClassroomDto.getSubjectId()).orElseThrow(() -> new ResourceNotFoundException("LecturerId not found"));
+        Subject subjectRequest = subjectService.findById(createClassroomDto.getSubjectId()).orElseThrow(() -> new ResourceNotFoundException("SubjectId not found"));
 
         //CHECK EXISTENCE REGISTERED LECTURER TO SUBJECT IN CLASSROOMS TABLE
         List<Classroom> lecturerExist = classroomRepository.findByLecturerId(lecturerRequest);
