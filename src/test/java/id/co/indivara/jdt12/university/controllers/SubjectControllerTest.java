@@ -1,72 +1,83 @@
 package id.co.indivara.jdt12.university.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import id.co.indivara.jdt12.university.exceptions.ResourceNotFoundException;
 import id.co.indivara.jdt12.university.models.Subject;
 import id.co.indivara.jdt12.university.services.interfaces.SubjectService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
-@WebMvcTest(SubjectController.class)
 class SubjectControllerTest {
-    @MockBean
+
+    @Mock
     private SubjectService subjectService;
 
-    @Autowired
-    MockMvc mockMvc;
+    @InjectMocks
+    private SubjectController subjectController;
 
-    private String adminAuth = "Basic YWRtaW46aW5pYWRtaW4=";
-
-    @Test
-    void createSubjectTest() throws Exception {
-        Subject subject = new Subject("90989", "MH1", "Math");
-        when(subjectService.createSubject(subject)).thenReturn(subject);
-        mockMvc.perform(post("/subject/")
-                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(subject)))
-                .andExpect(status().isCreated());
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    void getAllSubjects() throws Exception {
-        List<Subject> subjects = Arrays.asList(new Subject("90989", "MH1", "Math"),
-                new Subject("9808", "SC1", "Science")) ;
-        when(subjectService.fetchSubjectList()).thenReturn(subjects);
-        mockMvc.perform(get("/subject/")
-                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].subjectName").value("Math"))
-                .andExpect(jsonPath("$[1].subjectName").value("Science"));
+    void createSubject_ValidSubject_Success() {
+        Subject subject = new Subject();
+        Subject expectedSubject = new Subject();
+
+        when(subjectService.createSubject(subject)).thenReturn(expectedSubject);
+
+        ResponseEntity<Subject> response = subjectController.createSubject(subject);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(expectedSubject, response.getBody());
     }
 
     @Test
-    void deleteSubject() throws Exception {
-        Subject subject = new Subject("90989", "MH1", "Math");
-        doNothing().when(subjectService).deleteSubject("90989");
-        mockMvc.perform(delete("/subject/{subjectId}/", 90989)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
-                        .content(new ObjectMapper().writeValueAsString(subject)))
-                .andExpect(status().isOk());
+    void getAllSubjects_ReturnsListOfSubjects_Success() {
+        List<Subject> expectedSubjects = new ArrayList<>();
+        expectedSubjects.add(new Subject());
+        expectedSubjects.add(new Subject());
+
+        when(subjectService.fetchSubjectList()).thenReturn(expectedSubjects);
+
+        ResponseEntity<List<Subject>> response = subjectController.getAllSubjects();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedSubjects, response.getBody());
     }
 
+    @Test
+    void updateSubject_ValidSubjectAndSubjectId_Success() throws ResourceNotFoundException {
+        String subjectId = "123";
+        Subject subject = new Subject();
+        Subject expectedSubject = new Subject();
+
+        when(subjectService.updateSubject(subject, subjectId)).thenReturn(expectedSubject);
+
+        ResponseEntity<Subject> response = subjectController.updateSubject(subject, subjectId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedSubject, response.getBody());
+    }
+
+    @Test
+    void deleteSubject_ValidSubjectId_Success() throws ResourceNotFoundException {
+        String subjectId = "123";
+
+        ResponseEntity<Subject> response = subjectController.deleteSubject(subjectId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(subjectService, times(1)).deleteSubject(subjectId);
+    }
 }

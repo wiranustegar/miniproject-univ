@@ -29,6 +29,7 @@ public class Report extends BaseEntity {
 
     @ManyToOne(targetEntity = Classroom.class, cascade = CascadeType.ALL)
     @JoinColumn(name = "classroom_id", nullable = false)
+    @JsonIgnore
     private Classroom classroomId;
 
     @Column(name = "quiz_test")

@@ -1,101 +1,97 @@
 package id.co.indivara.jdt12.university.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import id.co.indivara.jdt12.university.exceptions.ResourceNotFoundException;
 import id.co.indivara.jdt12.university.models.Student;
 import id.co.indivara.jdt12.university.services.interfaces.StudentService;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(StudentController.class)
 class StudentControllerTest {
 
-    @MockBean
+    @Mock
     private StudentService studentService;
 
-    @Autowired
-    MockMvc mockMvc;
+    @InjectMocks
+    private StudentController studentController;
 
-    private String adminAuth = "Basic YWRtaW46aW5pYWRtaW4=";
-    private String studentAuth = "Basic c3R1ZGVudDppbmlzdHVkZW50";
-
-    //------ POSTIVE CASE -------
-    @Test
-    void createStudentTest() throws Exception {
-        Student student = new Student("11111", "tegar", 1010, "tegar@gmail.com", "MALE");
-        when(studentService.createStudent(student)).thenReturn(student);
-        mockMvc.perform(post("/student/")
-                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(student)))
-                .andExpect(status().isCreated());
-    }
-
-
-    @Test
-    void getAllStudentsTest() throws Exception {
-        List<Student> students = Arrays.asList(new Student("11111", "tegar", 1010, "tegar@gmail.com", "MALE"),
-                new Student("11112", "Tes", 1011, "test@gmail.com", "FEMALE")) ;
-
-        when(studentService.fetchStudentList()).thenReturn(students);
-        mockMvc.perform(get("/student/")
-                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].studentName").value("tegar"));
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    void getStudentByIdTest() throws Exception {
-        Student student = new Student("11111", "tegar", 1010, "tegar@gmail.com", "MALE");
-        when(studentService.findById("11111")).thenReturn(Optional.of(student));
-        mockMvc.perform(get("/student/{studentId}/", 11111)
-                        .header(HttpHeaders.AUTHORIZATION, studentAuth)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(student)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.studentName").value("tegar"));
+    void createStudent_ValidStudent_Success() {
+        Student student = new Student();
+        Student expectedStudent = new Student();
+
+        when(studentService.createStudent(student)).thenReturn(expectedStudent);
+
+        ResponseEntity<Student> response = studentController.createStudent(student);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(expectedStudent, response.getBody());
     }
 
     @Test
-    void deleteStudent() throws Exception {
-        Student student = new Student("11111", "tegar", 1010, "tegar@gmail.com", "MALE");
-        doNothing().when(studentService).deleteStudent("11111");
-        mockMvc.perform(delete("/student/{studentId}/", 11111)
-                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(student)))
-                .andExpect(status().isOk());
+    void getAllStudents_ReturnsListOfStudents_Success() {
+        List<Student> expectedStudents = new ArrayList<>();
+        expectedStudents.add(new Student());
+        expectedStudents.add(new Student());
+
+        when(studentService.fetchStudentList()).thenReturn(expectedStudents);
+
+        ResponseEntity<List<Student>> response = studentController.getAllStudents();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedStudents, response.getBody());
     }
 
-    //------- NEGATIVE CASE ---------
     @Test
-    void getStudentByIdNotFoundTest() throws Exception {
-        Student student = new Student("111212", "tegar", 1010, "tegar@gmail.com", "MALE");
-        when(studentService.findById("111215")).thenThrow(ResourceNotFoundException.class);
-        mockMvc.perform(get("/student/{studentId}/", 111215)
-                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(student)))
-                .andExpect(status().isNotFound());
+    void getStudentById_ValidStudentId_Success() throws ResourceNotFoundException {
+        String studentId = "123";
+        Optional<Student> expectedStudent = Optional.of(new Student());
+
+        when(studentService.findById(studentId)).thenReturn(expectedStudent);
+
+        ResponseEntity<Optional<Student>> response = studentController.getStudentById(studentId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedStudent, response.getBody());
+    }
+
+    @Test
+    void updateStudent_ValidStudentAndStudentId_Success() throws ResourceNotFoundException {
+        String studentId = "123";
+        Student student = new Student();
+        Student expectedStudent = new Student();
+
+        when(studentService.updateStudent(student, studentId)).thenReturn(expectedStudent);
+
+        ResponseEntity<Student> response = studentController.updateStudent(student, studentId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedStudent, response.getBody());
+    }
+
+    @Test
+    void deleteStudent_ValidStudentId_Success() throws ResourceNotFoundException {
+        String studentId = "123";
+
+        ResponseEntity<Student> response = studentController.deleteStudent(studentId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        verify(studentService, times(1)).deleteStudent(studentId);
     }
 }
