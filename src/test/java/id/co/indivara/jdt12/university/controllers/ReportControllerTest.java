@@ -1,80 +1,130 @@
 package id.co.indivara.jdt12.university.controllers;
 
+import id.co.indivara.jdt12.university.exceptions.ResourceNotFoundException;
+import id.co.indivara.jdt12.university.models.AuthRequest;
+import id.co.indivara.jdt12.university.models.Classroom;
+import id.co.indivara.jdt12.university.models.Report;
+import id.co.indivara.jdt12.university.models.Student;
+import id.co.indivara.jdt12.university.models.dtos.InputRecordAchievementDto;
+import id.co.indivara.jdt12.university.models.dtos.RegisterStudentDto;
 import id.co.indivara.jdt12.university.services.interfaces.ReportService;
-import id.co.indivara.jdt12.university.services.interfaces.StudentService;
+import id.co.indivara.jdt12.university.util.JwtUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.util.ArrayList;
+import java.util.List;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+
 class ReportControllerTest {
 
-    @MockBean
+    @Mock
+    private JwtUtil jwtUtil;
+
+    @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
     private ReportService reportService;
 
-    @Autowired
-    MockMvc mockMvc;
+    @InjectMocks
+    private ReportController reportController;
 
-    private String adminAuth = "Basic YWRtaW46aW5pYWRtaW4=";
-    private String lecturerAuth = "Basic bGVjdHVyZXI6aW5pbGVjdHVyZXI=";
-
-    //----- POSITIVE CASE -------
-    @Test
-    void testRegisterStudentSuccess() throws Exception {
-
-        String registerStudentJson = "{\"studentId\":\"4028b88188ee20690188ee2131bf0000\",\"classroomId\":\"4028b88188ee20690188ee23d7e00002\"}";
-        ResultActions resultActions = mockMvc.perform(post("/report/register/")
-                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(registerStudentJson))
-                .andExpect(status().isCreated());
-
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
-    void testInputRecordAchievement() throws Exception {
+    void generateToken_ValidAuthRequest_Success() throws Exception {
+        AuthRequest authRequest = new AuthRequest("username", "password");
+        String expectedToken = "generated-token";
 
-        String inputRecord = "{\"reportId\":\"4028b88188ee20690188ee24d1d30003\",\"quizTest\":70,\"midTest\":80,\"finalTest\":90}";
-        ResultActions resultActions = mockMvc.perform(put("/report/input-record/")
-                        .header(HttpHeaders.AUTHORIZATION, lecturerAuth)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(inputRecord))
-                .andExpect(status().isOk());
-    }
+        when(jwtUtil.generateToken(authRequest.getUserName())).thenReturn(expectedToken);
 
-    //------- NEGATIVE CASE --------
+        String result = reportController.generateToken(authRequest);
 
-    @Test
-    void registerStudentBadRequestTest() throws Exception {
-
-        String registerStudentJson = "{\"classroomId\":\"4028b88188ee20690188ee23d7e00002\"}";
-        ResultActions resultActions = mockMvc.perform(post("/report/register/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, adminAuth)
-                        .content(registerStudentJson))
-                .andExpect(status().isBadRequest());
+        assertEquals(expectedToken, result);
+        verify(authenticationManager, times(1)).authenticate(any());
     }
 
     @Test
-    void inputRecordAchievementBadRequestTest() throws Exception {
+    void registerStudent_ValidRegisterStudentDto_Success() throws ResourceNotFoundException {
+        RegisterStudentDto registerStudentDto = new RegisterStudentDto();
+        Report expectedReport = new Report();
 
-        String inputRecord = "{\"reportId\":\"4028b88188ee20690188ee24d1d30003\"midTest\":80,\"finalTest\":90}";
-        ResultActions resultActions = mockMvc.perform(put("/report/input-record/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, lecturerAuth)
-                        .content(inputRecord))
-                .andExpect(status().isBadRequest());
+        when(reportService.registerStudent(registerStudentDto)).thenReturn(expectedReport);
+
+        ResponseEntity<Report> response = reportController.registerStudent(registerStudentDto);
+
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(expectedReport, response.getBody());
     }
 
+    @Test
+    void allReports_ReturnsListOfReports_Success() {
+        List<Report> expectedReports = new ArrayList<>();
+        expectedReports.add(new Report());
+        expectedReports.add(new Report());
+
+        when(reportService.findAll()).thenReturn(expectedReports);
+
+        ResponseEntity<List<Report>> response = reportController.allReports();
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedReports, response.getBody());
+    }
+
+    @Test
+    void inputRecordAchievement_ValidInputRecordAchievementDto_Success() throws ResourceNotFoundException {
+        InputRecordAchievementDto inputRecordAchievementDto = new InputRecordAchievementDto();
+        Report expectedReport = new Report();
+
+        when(reportService.inputRecordAchievement(inputRecordAchievementDto)).thenReturn(expectedReport);
+
+        ResponseEntity<Report> response = reportController.inputRecordAchievement(inputRecordAchievementDto);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedReport, response.getBody());
+    }
+
+    @Test
+    void findReportByClassroomId_ValidClassroomId_Success() {
+        Classroom classroom = new Classroom();
+        List<Report> expectedReports = new ArrayList<>();
+        expectedReports.add(new Report());
+        expectedReports.add(new Report());
+
+        when(reportService.findByClassroomId(classroom)).thenReturn((ArrayList<Report>) expectedReports);
+
+        ResponseEntity<List<Report>> response = reportController.findReportByClassroomId(classroom);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedReports, response.getBody());
+    }
+
+    @Test
+    void findReportByStudentId_ValidStudentId_Success() {
+        Student student = new Student();
+        List<Report> expectedReports = new ArrayList<>();
+        expectedReports.add(new Report());
+        expectedReports.add(new Report());
+
+        when(reportService.findByStudentId(student)).thenReturn((ArrayList<Report>) expectedReports);
+
+        ResponseEntity<List<Report>> response = reportController.findReportByStudentId(student);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedReports, response.getBody());
+    }
 }
